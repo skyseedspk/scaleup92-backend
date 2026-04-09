@@ -32,6 +32,21 @@ let settings = {
   isPremiumUser: false,
 };
 
+let contacts = [
+  {
+    id: "c1",
+    name: "Demo User",
+    email: "skyseedspk@gmail.com",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "c2",
+    name: "Second User",
+    email: "azclhr@gmail.com",
+    createdAt: new Date().toISOString(),
+  },
+];
+
 const premiumTemplates = [
   {
     id: "tpl_1",
@@ -222,9 +237,9 @@ function buildHtmlEmail({ subject, body, theme = "classic" }) {
   </html>`;
 }
 
-// ------------------------------------
-// Health
-// ------------------------------------
+// -------------------------------
+// HEALTH
+// -------------------------------
 app.get("/", (req, res) => {
   res.send("ScaleUp92 backend running");
 });
@@ -239,9 +254,9 @@ app.get("/health", (req, res) => {
   });
 });
 
-// ------------------------------------
-// Premium status
-// ------------------------------------
+// -------------------------------
+// SETTINGS
+// -------------------------------
 app.get("/settings", (req, res) => {
   res.json({
     success: true,
@@ -260,9 +275,9 @@ app.post("/settings/premium", (req, res) => {
   });
 });
 
-// ------------------------------------
-// Templates
-// ------------------------------------
+// -------------------------------
+// TEMPLATES
+// -------------------------------
 app.get("/templates", (req, res) => {
   const category = cleanText(req.query.category || "All");
 
@@ -277,9 +292,80 @@ app.get("/templates", (req, res) => {
   });
 });
 
-// ------------------------------------
-// AI generate
-// ------------------------------------
+// -------------------------------
+// CONTACTS
+// -------------------------------
+app.get("/contacts", (req, res) => {
+  res.json({
+    success: true,
+    contacts,
+  });
+});
+
+app.post("/contacts", (req, res) => {
+  const { name, email } = req.body || {};
+
+  if (!name || !email || !String(email).includes("@")) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid name or email",
+    });
+  }
+
+  const newContact = {
+    id: `c_${Date.now()}`,
+    name: String(name),
+    email: String(email),
+    createdAt: new Date().toISOString(),
+  };
+
+  contacts.unshift(newContact);
+
+  return res.json({
+    success: true,
+    message: "Contact added successfully",
+    contact: newContact,
+  });
+});
+
+app.put("/contacts/:id", (req, res) => {
+  const id = req.params.id;
+  const { name, email } = req.body || {};
+
+  const index = contacts.findIndex((c) => c.id === id);
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      message: "Contact not found",
+    });
+  }
+
+  contacts[index] = {
+    ...contacts[index],
+    name: name || contacts[index].name,
+    email: email || contacts[index].email,
+  };
+
+  return res.json({
+    success: true,
+    message: "Contact updated",
+    contact: contacts[index],
+  });
+});
+
+app.delete("/contacts/:id", (req, res) => {
+  const id = req.params.id;
+  contacts = contacts.filter((c) => c.id !== id);
+
+  return res.json({
+    success: true,
+    message: "Contact deleted",
+  });
+});
+
+// -------------------------------
+// AI GENERATE
+// -------------------------------
 app.post("/generate", async (req, res) => {
   try {
     const prompt = cleanText(req.body?.prompt || "");
@@ -381,9 +467,9 @@ www.skyseeds.pk
   }
 });
 
-// ------------------------------------
-// Drafts
-// ------------------------------------
+// -------------------------------
+// DRAFTS
+// -------------------------------
 app.get("/drafts", (req, res) => {
   res.json({
     success: true,
@@ -421,9 +507,9 @@ app.delete("/drafts/:id", (req, res) => {
   });
 });
 
-// ------------------------------------
-// History
-// ------------------------------------
+// -------------------------------
+// HISTORY
+// -------------------------------
 app.get("/history", (req, res) => {
   res.json({
     success: true,
@@ -431,9 +517,9 @@ app.get("/history", (req, res) => {
   });
 });
 
-// ------------------------------------
-// Preview HTML
-// ------------------------------------
+// -------------------------------
+// PREVIEW HTML
+// -------------------------------
 app.post("/preview-html", (req, res) => {
   const subject = cleanText(req.body?.subject || "");
   const body = String(req.body?.body || "").trim();
@@ -454,9 +540,9 @@ app.post("/preview-html", (req, res) => {
   });
 });
 
-// ------------------------------------
-// Send email
-// ------------------------------------
+// -------------------------------
+// SEND EMAIL
+// -------------------------------
 app.post("/send-email", async (req, res) => {
   try {
     const { name, emails, subject, message, theme, attachments } = req.body;
@@ -550,9 +636,9 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
-// ------------------------------------
-// Reports
-// ------------------------------------
+// -------------------------------
+// REPORTS
+// -------------------------------
 app.get("/reports", (req, res) => {
   res.json({
     success: true,
