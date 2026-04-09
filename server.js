@@ -23,9 +23,6 @@ if (SENDGRID_API_KEY) {
   sgMail.setApiKey(SENDGRID_API_KEY);
 }
 
-// -------------------------------
-// In-memory demo storage
-// -------------------------------
 let drafts = [];
 let history = [];
 let settings = {
@@ -36,13 +33,13 @@ let contacts = [
   {
     id: "c1",
     name: "Demo User",
-    email: "skyseedspk@gmail.com",
+    email: "demo@example.com",
     createdAt: new Date().toISOString(),
   },
   {
     id: "c2",
     name: "Second User",
-    email: "azclhr@gmail.com",
+    email: "second@example.com",
     createdAt: new Date().toISOString(),
   },
 ];
@@ -51,24 +48,24 @@ const premiumTemplates = [
   {
     id: "tpl_1",
     title: "Fresh Green Promo",
-    subtitle: "Clean gardening promotion style",
-    category: "Gardening",
-    subject: "Summer Season Seeds Available Now",
+    subtitle: "Clean promotion style",
+    category: "Promotional",
+    subject: "Premium Products Available Now",
     body:
-      "Hello,\n\nWe are pleased to share that our summer season seeds are now available for home gardening and seasonal planting needs.\n\nOur seed range is selected to support healthy growth, better germination, and a productive gardening experience.\n\nIf you would like product details, pricing, or order support, please contact us today.\n\nBest regards,\nSkySeeds.pk\nwww.skyseeds.pk",
+      "Hello,\n\nWe are pleased to share that our premium product range is now available for customers looking for quality, performance, and reliable results.\n\nOur selected products are designed to support better use, smoother campaigns, and stronger customer satisfaction.\n\nIf you would like product details, pricing, or order support, please contact us today.\n\nBest regards,\nScaleUp",
     isPremium: false,
     badge: "FREE",
     colors: ["#16A34A", "#86EFAC"],
-    icon: "eco",
+    icon: "promo",
   },
   {
     id: "tpl_2",
     title: "Luxury Gold Offer",
     subtitle: "Premium elegant promotion",
     category: "Luxury",
-    subject: "Premium Gardening Products for Better Results",
+    subject: "Premium Products for Better Results",
     body:
-      "Hello,\n\nWe are delighted to present our premium gardening range designed for customers who value quality, performance, and dependable results.\n\nOur selected products help create a smoother and more professional gardening experience.\n\nFor pricing, product details, and order support, please contact us today.\n\nBest regards,\nSkySeeds.pk\nwww.skyseeds.pk",
+      "Hello,\n\nWe are delighted to present our premium range designed for customers who value quality, performance, and dependable results.\n\nOur selected products help create a smoother and more professional experience for every campaign.\n\nFor pricing, product details, and order support, please contact us today.\n\nBest regards,\nScaleUp",
     isPremium: true,
     badge: "PREMIUM",
     colors: ["#D97706", "#FDE68A"],
@@ -79,9 +76,9 @@ const premiumTemplates = [
     title: "Color Burst Sale",
     subtitle: "Bright seasonal campaign",
     category: "Seasonal",
-    subject: "Seasonal Gardening Essentials Available",
+    subject: "Special Seasonal Offers Available",
     body:
-      "Hello,\n\nWe are excited to share our seasonal gardening essentials for customers looking for reliable products and better planting support.\n\nOur collection is designed to help make gardening easier, smoother, and more rewarding.\n\nFor product information and pricing, feel free to contact us.\n\nBest regards,\nSkySeeds.pk\nwww.skyseeds.pk",
+      "Hello,\n\nWe are excited to share our seasonal offers for customers looking for reliable products and better value.\n\nOur collection is designed to help make every campaign stronger, smoother, and more effective.\n\nFor product information and pricing, feel free to contact us.\n\nBest regards,\nScaleUp",
     isPremium: false,
     badge: "FREE",
     colors: ["#7C3AED", "#C084FC"],
@@ -94,7 +91,7 @@ const premiumTemplates = [
     category: "Business",
     subject: "Professional Supply Available for Business Needs",
     body:
-      "Hello,\n\nWe are pleased to offer professional supply options designed for business customers who need dependable products and smooth service.\n\nOur range supports better performance, practical use, and strong customer confidence.\n\nPlease contact us for pricing, supply details, and order support.\n\nBest regards,\nSkySeeds.pk\nwww.skyseeds.pk",
+      "Hello,\n\nWe are pleased to offer professional supply options designed for business customers who need dependable products and smooth service.\n\nOur range supports better performance, practical use, and strong customer confidence.\n\nPlease contact us for pricing, supply details, and order support.\n\nBest regards,\nScaleUp",
     isPremium: true,
     badge: "PREMIUM",
     colors: ["#111827", "#6D28D9"],
@@ -107,7 +104,7 @@ const premiumTemplates = [
     category: "Festive",
     subject: "Special Festive Offer Available Now",
     body:
-      "Hello,\n\nWe are pleased to share a festive offer for customers looking for quality products and better value.\n\nThis special collection is designed to bring more excitement, better presentation, and premium appeal to your campaign.\n\nPlease contact us for product details and pricing.\n\nBest regards,\nSkySeeds.pk\nwww.skyseeds.pk",
+      "Hello,\n\nWe are pleased to share a festive offer for customers looking for quality products and better value.\n\nThis special collection is designed to bring more excitement, better presentation, and premium appeal to your campaign.\n\nPlease contact us for product details and pricing.\n\nBest regards,\nScaleUp",
     isPremium: true,
     badge: "PREMIUM",
     colors: ["#EC4899", "#F9A8D4"],
@@ -117,6 +114,15 @@ const premiumTemplates = [
 
 function cleanText(text = "") {
   return String(text).replace(/\s+/g, " ").trim();
+}
+
+function normalizeEmail(email = "") {
+  return String(email).trim().toLowerCase();
+}
+
+function isValidEmail(email = "") {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(String(email).trim().toLowerCase());
 }
 
 function extractJson(text = "") {
@@ -149,8 +155,7 @@ Our products are selected to support better results, practical use, and reliable
 If you would like product details, pricing, or order support, please contact us today.
 
 Best regards,
-SkySeeds.pk
-www.skyseeds.pk`,
+ScaleUp`,
     },
     {
       name: "Template 2",
@@ -164,8 +169,7 @@ Our selected range supports practical use, smooth results, and customer satisfac
 For product details, pricing, and support, please contact us today.
 
 Best regards,
-SkySeeds.pk
-www.skyseeds.pk`,
+ScaleUp`,
     },
     {
       name: "Template 3",
@@ -177,8 +181,7 @@ ${topic} is now available for customers who want dependable quality and better v
 We are ready to help you with product information, pricing, and order support.
 
 Best regards,
-SkySeeds.pk
-www.skyseeds.pk`,
+ScaleUp`,
     },
   ];
 }
@@ -231,17 +234,19 @@ function buildHtmlEmail({ subject, body, theme = "classic" }) {
           <div style="padding:28px;color:${selected.text};font-size:16px;line-height:1.8;">
             ${safeBody}
           </div>
+          <div style="padding:0 28px 28px 28px;">
+            <div style="background:#F3F4F6;border-radius:16px;padding:16px;">
+              <strong>ScaleUp</strong>
+            </div>
+          </div>
         </div>
       </div>
     </body>
   </html>`;
 }
 
-// -------------------------------
-// HEALTH
-// -------------------------------
 app.get("/", (req, res) => {
-  res.send("ScaleUp92 backend running");
+  res.send("ScaleUp backend running");
 });
 
 app.get("/health", (req, res) => {
@@ -254,9 +259,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-// -------------------------------
-// SETTINGS
-// -------------------------------
 app.get("/settings", (req, res) => {
   res.json({
     success: true,
@@ -275,9 +277,6 @@ app.post("/settings/premium", (req, res) => {
   });
 });
 
-// -------------------------------
-// TEMPLATES
-// -------------------------------
 app.get("/templates", (req, res) => {
   const category = cleanText(req.query.category || "All");
 
@@ -292,9 +291,6 @@ app.get("/templates", (req, res) => {
   });
 });
 
-// -------------------------------
-// CONTACTS
-// -------------------------------
 app.get("/contacts", (req, res) => {
   res.json({
     success: true,
@@ -305,17 +301,45 @@ app.get("/contacts", (req, res) => {
 app.post("/contacts", (req, res) => {
   const { name, email } = req.body || {};
 
-  if (!name || !email || !String(email).includes("@")) {
+  if (!name || !email) {
     return res.status(400).json({
       success: false,
-      message: "Invalid name or email",
+      message: "Name and email required",
+    });
+  }
+
+  const cleanName = String(name).trim();
+  const cleanEmail = normalizeEmail(email);
+
+  if (!cleanName) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid name",
+    });
+  }
+
+  if (!isValidEmail(cleanEmail)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email format",
+    });
+  }
+
+  const exists = contacts.find(
+    (c) => normalizeEmail(c.email) === cleanEmail
+  );
+
+  if (exists) {
+    return res.status(400).json({
+      success: false,
+      message: "Email already exists",
     });
   }
 
   const newContact = {
-    id: `c_${Date.now()}`,
-    name: String(name),
-    email: String(email),
+    id: `c_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    name: cleanName,
+    email: cleanEmail,
     createdAt: new Date().toISOString(),
   };
 
@@ -340,10 +364,38 @@ app.put("/contacts/:id", (req, res) => {
     });
   }
 
+  const updatedName = name ? String(name).trim() : contacts[index].name;
+  const updatedEmail = email ? normalizeEmail(email) : contacts[index].email;
+
+  if (!updatedName) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid name",
+    });
+  }
+
+  if (!isValidEmail(updatedEmail)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email format",
+    });
+  }
+
+  const duplicate = contacts.find(
+    (c) => c.id !== id && normalizeEmail(c.email) === updatedEmail
+  );
+
+  if (duplicate) {
+    return res.status(400).json({
+      success: false,
+      message: "Email already exists",
+    });
+  }
+
   contacts[index] = {
     ...contacts[index],
-    name: name || contacts[index].name,
-    email: email || contacts[index].email,
+    name: updatedName,
+    email: updatedEmail,
   };
 
   return res.json({
@@ -363,9 +415,6 @@ app.delete("/contacts/:id", (req, res) => {
   });
 });
 
-// -------------------------------
-// AI GENERATE
-// -------------------------------
 app.post("/generate", async (req, res) => {
   try {
     const prompt = cleanText(req.body?.prompt || "");
@@ -416,10 +465,10 @@ Rules:
 - No irrelevant content
 - Simple professional English
 - Direct promotional emails only
+- Brand name must be ScaleUp
 - End each body with:
 Best regards,
-SkySeeds.pk
-www.skyseeds.pk
+ScaleUp
 `,
         },
         {
@@ -467,9 +516,6 @@ www.skyseeds.pk
   }
 });
 
-// -------------------------------
-// DRAFTS
-// -------------------------------
 app.get("/drafts", (req, res) => {
   res.json({
     success: true,
@@ -507,9 +553,6 @@ app.delete("/drafts/:id", (req, res) => {
   });
 });
 
-// -------------------------------
-// HISTORY
-// -------------------------------
 app.get("/history", (req, res) => {
   res.json({
     success: true,
@@ -517,9 +560,6 @@ app.get("/history", (req, res) => {
   });
 });
 
-// -------------------------------
-// PREVIEW HTML
-// -------------------------------
 app.post("/preview-html", (req, res) => {
   const subject = cleanText(req.body?.subject || "");
   const body = String(req.body?.body || "").trim();
@@ -540,9 +580,6 @@ app.post("/preview-html", (req, res) => {
   });
 });
 
-// -------------------------------
-// SEND EMAIL
-// -------------------------------
 app.post("/send-email", async (req, res) => {
   try {
     const { name, emails, subject, message, theme, attachments } = req.body;
@@ -562,8 +599,8 @@ app.post("/send-email", async (req, res) => {
     }
 
     const validEmails = emails
-      .map((e) => String(e).trim())
-      .filter((e) => e.includes("@"));
+      .map((e) => normalizeEmail(e))
+      .filter((e) => isValidEmail(e));
 
     if (validEmails.length === 0) {
       return res.status(400).json({
@@ -636,9 +673,6 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
-// -------------------------------
-// REPORTS
-// -------------------------------
 app.get("/reports", (req, res) => {
   res.json({
     success: true,
