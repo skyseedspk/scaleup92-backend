@@ -1,65 +1,74 @@
-const express = require("express");
-const nodemailer = require("nodemailer");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import nodemailer from "nodemailer";
+
+dotenv.config();
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({
     status: "online",
     app: "ScaleUp92 Backend",
-    message: "Backend is running successfully"
+    message: "Backend is running successfully",
+    emailApi: "ready",
   });
 });
 
 app.get("/health", (req, res) => {
   res.json({
-    success: true
+    success: true,
+    message: "Server OK",
   });
 });
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
 app.post("/send-email", async (req, res) => {
-
   try {
+    const { to, subject, message, html } = req.body;
 
-    const { to, subject, html } = req.body;
+    if (!to || !subject || (!message && !html)) {
+      return res.status(400).json({
+        success: false,
+        error: "to, subject, and message/html required",
+      });
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 465),
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
     await transporter.sendMail({
-      from: `${process.env.FROM_NAME} <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.FROM_NAME || "ScaleUp92"}" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      html
+      text: message || "",
+      html: html || message || "",
     });
 
-    return res.json({
+    res.json({
       success: true,
-      message: "Email sent successfully"
+      message: "Email sent successfully",
     });
-
   } catch (error) {
-
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
-
   }
-
 });
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`ScaleUp92 server running on port ${PORT}`);
 });
