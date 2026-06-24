@@ -15,14 +15,14 @@ app.get("/", (req, res) => {
     status: "online",
     app: "ScaleUp92 Backend",
     message: "Backend is running successfully",
-    emailApi: "ready",
+    emailApi: "ready"
   });
 });
 
 app.get("/health", (req, res) => {
   res.json({
     success: true,
-    message: "Server OK",
+    message: "Server OK"
   });
 });
 
@@ -33,18 +33,23 @@ app.post("/send-email", async (req, res) => {
     if (!to || !subject || (!message && !html)) {
       return res.status(400).json({
         success: false,
-        error: "to, subject, and message/html required",
+        error: "to, subject, and message/html required"
       });
     }
 
+    const smtpPort = Number(process.env.SMTP_PORT || 587);
+
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 465),
-      secure: true,
+      port: smtpPort,
+      secure: smtpPort === 465,
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        pass: process.env.EMAIL_PASS
       },
+      connectionTimeout: 30000,
+      greetingTimeout: 30000,
+      socketTimeout: 30000
     });
 
     await transporter.sendMail({
@@ -52,17 +57,17 @@ app.post("/send-email", async (req, res) => {
       to,
       subject,
       text: message || "",
-      html: html || message || "",
+      html: html || message || ""
     });
 
     res.json({
-      success: false,
-      message: "Email sent successfully",
+      success: true,
+      message: "Email sent successfully"
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: error.message
     });
   }
 });
